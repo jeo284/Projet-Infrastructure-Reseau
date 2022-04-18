@@ -9,7 +9,7 @@ ip netns add poste1
 ip netns add poste2
 ip netns add poste3
 ip netns add poste4
-ip netns add internet1
+ip netns add internet1 
 
 #créer les switchs
 ovs-vsctl add-br resB
