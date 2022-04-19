@@ -122,34 +122,90 @@ ip netns exec rout1 ip link add link rout1-eth1 name rout1-eth1.100 type vlan id
 ip netns exec rout1 ip link set dev rout1-eth1.100 up
 ip netns exec rout1 ip link add link rout1-eth1 name rout1-eth1.200 type vlan id 200
 ip netns exec rout1 ip link set dev rout1-eth1.200 up
-ip netns exec rout1 ip a add dev rout1-eth1.100 192.168.100.254/24 brd +
-ip netns exec rout1 ip a add dev rout1-eth1.200 192.168.200.254/24 brd +
+ip netns exec rout1 ip a add dev rout1-eth1.100 192.168.100.254/24 brd 192.168.100.255
+ip netns exec rout1 ip a add dev rout1-eth1.200 192.168.200.254/24 brd 192.168.200.255
 
 ip netns exec rout2 ip link add link rout2-eth1 name rout2-eth1.100 type vlan id 100
 ip netns exec rout2 ip link set dev rout2-eth1.100 up
 ip netns exec rout2 ip link add link rout2-eth1 name rout2-eth1.200 type vlan id 200
 ip netns exec rout2 ip link set dev rout2-eth1.200 up
-ip netns exec rout2 ip a add dev rout2-eth1.100 192.168.100.253/24 brd +
-ip netns exec rout2 ip a add dev rout2-eth1.200 192.168.200.253/24 brd +
+ip netns exec rout2 ip a add dev rout2-eth1.100 192.168.100.253/24 brd 192.168.100.255
+ip netns exec rout2 ip a add dev rout2-eth1.200 192.168.200.253/24 brd 192.168.200.255
 
 ip netns exec poste1 ip link add link poste1-eth0 name poste1-eth0.100 type vlan id 100
 ip netns exec poste1 ip link set poste1-eth0.100 up
-ip netns exec poste1 ip a add dev poste1-eth0.100 192.168.100.1/24 brd +
+ip netns exec poste1 ip a add dev poste1-eth0.100 192.168.100.1/24 brd 192.168.100.255
 
 ip netns exec poste2 ip link add link poste2-eth0 name poste2-eth0.200 type vlan id 200
 ip netns exec poste2 ip link set poste2-eth0.200 up
-ip netns exec poste2 ip a add dev poste2-eth0.200 192.168.200.1/24 brd +
+ip netns exec poste2 ip a add dev poste2-eth0.200 192.168.200.1/24 brd 192.168.200.255
 
 ip netns exec poste3 ip link add link poste3-eth0 name poste3-eth0.100 type vlan id 100
 ip netns exec poste3 ip link set poste3-eth0.100 up
-ip netns exec poste3 ip a add dev poste3-eth0.100 192.168.100.2/24 brd +
+ip netns exec poste3 ip a add dev poste3-eth0.100 192.168.100.2/24 brd 192.168.100.255
 
 ip netns exec poste4 ip link add link poste4-eth0 name poste4-eth0.200 type vlan id 200
 ip netns exec poste4 ip link set poste4-eth0.200 up
-ip netns exec poste4 ip a add dev poste4-eth0.200 192.168.200.2/24 brd +
+ip netns exec poste4 ip a add dev poste4-eth0.200 192.168.200.2/24 brd 192.168.200.255
 
 #route par défaut
 ip netns exec poste1 ip r add default via 192.168.100.253
 ip netns exec poste2 ip r add default via 192.168.200.253
 ip netns exec poste3 ip r add default via 192.168.100.254
-ip netns exic poste4 ip r add default via 192.168.200.254
+ip netns exec poste4 ip r add default via 192.168.200.254
+
+#Mise en place du tunnel L2TPv3
+#nstaller le paquet «bridge-utils»
+#rout1
+#creation du tunel: l'interface IF2 ici l2tpeth0
+#de 172.16.1.253 -> 172.16.2.253
+ip netns exec rout1 ip l2tp add tunnel remote 172.16.2.253 local 172.16.1.253 encap ip tunnel_id 3000 peer_tunnel_id 4000
+ip netns exec rout1 ip l2tp add session tunnel_id 3000 session_id 1000 peer_session_id 2000
+#activation de l2tpeth0
+ip netns exec rout1 ip link set l2tpeth0 up
+#ajout du bridge "tunel"
+ip netns exec rout1 brctl addbr tunnel
+#ajout dans de l'interface du tunel (l2tpeth0) le bridge sans configuration
+ip netns exec rout1 brctl addif tunnel l2tpeth0
+#ajout dans de l'interface connecté au réseau (rout1-eth1) le bridge sans configuration
+ip netns exec rout1 brctl addif tunnel rout1-eth1
+#activation de l'interface correspondant au bridge
+ip netns exec rout1 ip link set tunnel up
+#configuration de l’étiquettage VLAN pour le VLAN 100
+ip netns exec rout1 ip netns exec rout1 ip link add link tunnel name tunnel.100 type vlan id 100
+#activation
+ip netns exec rout1 ip link set tunnel.100 up
+#configuration de l’étiquettage VLAN pour le VLAN 200
+ip netns exec rout1 ip netns exec rout1 ip link add link tunnel name tunnel.200 type vlan id 200
+#activation
+ip netns exec rout1 ip link set tunnel.200 up
+#configuration IP de l’interface
+ip netns exec rout1 ip addr add 192.168.100.254/24 dev tunnel.100
+ip netns exec rout1 ip addr add 192.168.200.254/24 dev tunnel.200
+
+#rout2
+#creation du tunel: l'interface IF2 ici l2tpeth0
+#de 172.16.2.253 -> 172.16.1.253
+ip netns exec rout2 ip l2tp add tunnel local 172.16.2.253 remote 172.16.1.253 encap ip tunnel_id 3000 peer_tunnel_id 4000
+ip netns exec rout2 ip l2tp add session tunnel_id 3000 session_id 1000 peer_session_id 2000
+#activation de l2tpeth0
+ip netns exec rout2 ip link set l2tpeth0 up
+#ajout du bridge "tunel"
+ip netns exec rout2 brctl addbr tunnel
+#ajout dans de l'interface du tunel (l2tpeth0) le bridge sans configuration
+ip netns exec rout2 brctl addif tunnel l2tpeth0
+#ajout dans de l'interface connecté au réseau (rout2-eth1) le bridge sans configuration
+ip netns exec rout2 brctl addif tunnel rout2-eth1
+#activation de l'interface correspondant au bridge
+ip netns exec rout2 ip link set tunnel up
+#configuration de l’étiquettage VLAN pour le VLAN 100
+ip netns exec rout2 ip netns exec rout2 ip link add link tunnel name tunnel.100 type vlan id 100
+#activation
+ip netns exec rout2 ip link set tunnel.100 up
+#configuration de l’étiquettage VLAN pour le VLAN 200
+ip netns exec rout2 ip netns exec rout2 ip link add link tunnel name tunnel.200 type vlan id 200
+#activation
+ip netns exec rout2 ip link set tunnel.200 up
+#configuration IP de l’interface
+ip netns exec rout2 ip addr add 192.168.100.253/24 dev tunnel.100
+ip netns exec rout2 ip addr add 192.168.200.253/24 dev tunnel.200

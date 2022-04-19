@@ -1,0 +1,15 @@
+#test de connectivité avec ICMP
+poste1 :ping -c 2 192.168.100.253
+rout2 : sudo tcpdump -i rout2-eth1 -lnvve. On voit que les paquets qui transitent au travers du poste1 et du routeur 2 sont étiquetés vlan 100, ID 100
+Protocole 802.1Q 
+Analyse poussée avec tshark : tshark -i resE-rout2 -V
+taille trame: 102 bytes
+@Macsrc: 
+@Mcdst:
+Protocole: 802.1Q Virtual LAN (0x8100)
+ID: 100
+Priority: Best Effort (default) : pour de la QoS
+#tester avec plusieurs autres protocoles et répondre aux question (TCP, http,...)
+
+
+#Etablir  le tunnel L2TPv3 en mode encapsulation IP entre Routeur1et Routeur2.
