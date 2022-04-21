@@ -1,0 +1,80 @@
+#!/bin/bash -x
+
+# créer les namespaces pour les hôtes
+ip netns add poste3
+ip netns add poste4
+ip netns add rout1
+ip netns add routA
+
+
+# créer le switch
+ovs-vsctl add-br resC
+ovs-vsctl add-br resD
+ovs-vsctl add-br internet1
+
+# configuration du réseaux 1
+# créer les liens du routeur A , 1 et les postes
+ip link add routA-eth1 type veth peer name internet1-routA
+ip link add routA-eth0 type veth peer name resC-routA
+ip link add rout1-eth1 type veth peer name resC-rout1
+ip link add rout1-eth0 type veth peer name resD-rout1
+ip link add poste3-eth0 type veth peer name resD-poste3
+ip link add poste4-eth0 type veth peer name resD-poste4
+
+# accrocher les liens aux namespaces
+ip link set routA-eth0 netns routA
+ip link set routA-eth1 netns routA
+ip link set rout1-eth0 netns rout1
+ip link set rout1-eth1 netns rout1
+ip link set poste3-eth0 netns poste3
+ip link set poste4-eth0 netns poste4
+
+
+# connecter les liens au switch
+ovs-vsctl add-port internet1 internet1-routA
+ovs-vsctl add-port resC resC-routA
+ovs-vsctl add-port resC resC-rout1
+ovs-vsctl add-port resD resD-rout1
+ovs-vsctl add-port resD resD-poste3
+ovs-vsctl add-port resD resD-poste4
+
+
+# activer les interfaces des namespaces routA et rout1
+ip link set dev resC-routA up
+ip link set dev internet1-routA up
+ip netns exec routA ip link set dev lo up
+ip netns exec routA ip link set dev routA-eth0 up
+ip netns exec routA ip link set dev routA-eth1 up
+
+ip link set dev resD-rout1 up
+ip link set dev resC-rout1 up
+ip netns exec rout1 ip link set dev rout1-eth0 up
+ip netns exec rout1 ip link set dev rout1-eth1 up
+ip netns exec rout1 ip link set dev lo up
+
+# activer les interfaces des namespaces poste3 et poste 4
+ip link set dev resD-poste3 up
+ip link set dev resD-poste4 up
+ip netns exec poste3 ip link set dev poste3-eth0 up
+ip netns exec poste4 ip link set dev poste4-eth0 up
+ip netns exec poste3 ip link set dev lo up
+ip netns exec poste4 ip link set dev lo up
+
+
+# configurer les réseaux sur le routeur A et 1
+ip netns exec routA ip a add dev routA-eth1 10.87.0.1/24
+ip netns exec routA ip a add dev routA-eth0 172.16.1.254/24
+ip netns exec rout1 ip a add dev rout1-eth1 172.16.1.253/24
+ip netns exec rout1 ip a add dev rout1-eth0 192.168.100.254/24
+
+
+
+# configurer la route par default du  rout1
+ip netns exec rout1 ip r add default via 172.16.1.253
+
+# lancer le server DHCP
+ip netns exec rout1 dnsmasq -d -z -i rout1-eth0 -F 192.168.100.1,192.168.100.150,255.255.255.0 &
+
+# activer le routage sur routA et rout1
+ip netns exec routA sudo sysctl net.ipv4.conf.all.forwarding=1
+ip netns exec rout1 sudo sysctl net.ipv4.conf.all.forwarding=1
