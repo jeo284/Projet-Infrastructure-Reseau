@@ -46,7 +46,7 @@ ip link set dev internet1-routB up
 ip netns exec routB ip link set dev lo up
 ip netns exec routB ip link set dev routB-eth0 up
 ip netns exec routB ip link set dev routB-eth1 up
-ip netns exec routB ip a add dev routB-eth0 172.16.1.254/24
+ip netns exec routB ip a add dev routB-eth0 172.16.2.254/24
 ip netns exec routB ip a add dev routB-eth1 10.87.0.2/24
 ip netns exec routB sysctl net.ipv4.conf.all.forwarding=1
 
@@ -77,7 +77,7 @@ ip link set dev resE-rout2 up
 ip netns exec rout2 ip link set dev lo up
 ip netns exec rout2 ip link set dev rout2-eth0 up
 ip netns exec rout2 ip link set dev rout2-eth1 up
-ip netns exec rout2 ip a add dev rout2-eth0 172.16.1.253/24
+ip netns exec rout2 ip a add dev rout2-eth0 172.16.2.253/24
 ip netns exec rout2 sysctl net.ipv4.conf.all.forwarding=1
 
 #configuration du poste 1
