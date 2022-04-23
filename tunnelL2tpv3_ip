@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# installer sudo apt-get install bridge-utils 
+# installer sudo apt-get install bridge-utils
 # rout1 ===
-
-# route par défaut routeur1 pour accéder du tunnel
-# ip netns exec rout1 ip r add default via 172.16.1.254
 
 # Création du tunnel: l'interface IF2 ici l2tpeth0 de 172.16.1.253 -> 172.16.2.253
 
@@ -47,11 +44,6 @@ ip netns exec rout1 ip addr add 192.168.200.254/24 dev tunnel.200
 
 
 # rout2 ===
-# creation du tunel: l'interface IF2 ici l2tpeth0
-# route par défaut routeur1 pour accéder du tunnel
-# ip netns exec rout2 ip r add default via 172.16.2.254
-# de 172.16.2.253 -> 172.16.1.253
-
 
 # Création du tunnel: l'interface IF2 ici l2tpeth0 de 172.16.2.253 -> 172.16.1.253
 

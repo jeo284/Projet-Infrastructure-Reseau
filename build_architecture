@@ -1,15 +1,17 @@
 #!/bin/bash -x
 
+#export PATH=/usr/lib/quagga:$PATH
 
 # créer les namespaces
 ip netns add poste3
 ip netns add poste4
-ip netns add rout1
-ip netns add routA
-ip netns add rout2
-ip netns add routB
 ip netns add poste1
 ip netns add poste2
+ip netns add rout1
+ip netns add rout2
+ip netns add routA
+ip netns add routB
+
 
 # créer les switches
 ovs-vsctl add-br resC
@@ -18,59 +20,66 @@ ovs-vsctl add-br resE
 ovs-vsctl add-br resB
 ovs-vsctl add-br internet1
 
-# configuration du du réseaux 1
-# créer les liens du routeur A , 1 et les postes [3:4]
-ip link add routA-eth0 type veth peer name internet1-routA
-ip link add routA-eth1 type veth peer name resC-routA
-ip link add rout1-eth0 type veth peer name resC-rout1
-ip link add rout1-eth1 type veth peer name resD-rout1
+# créer le répertoire de travail
+# mkdir -p /run/quagga
+
+# configuration des réseaux 1 et 2
+
 ip link add poste3-eth0 type veth peer name resD-poste3
 ip link add poste4-eth0 type veth peer name resD-poste4
-
-# configuration du réseaux 2
-# créer les liens du routeur B, 2 et les postes [1:2]
-ip link add routB-eth0 type veth peer name internet1-routB
-ip link add routB-eth1 type veth peer name resB-routB
-ip link add rout2-eth0 type veth peer name resB-rout2
-ip link add rout2-eth1 type veth peer name resE-rout2
 ip link add poste1-eth0 type veth peer name resE-poste1
 ip link add poste2-eth0 type veth peer name resE-poste2
 
+ip link add routA-eth1 type veth peer name resC-routA
+ip link add routA-eth0 type veth peer name internet1-routA
 
-# accrocher les liens aux namespaces du réseaux 1
-ip link set routA-eth0 netns routA
-ip link set routA-eth1 netns routA
-ip link set rout1-eth0 netns rout1
-ip link set rout1-eth1 netns rout1
+ip link add rout1-eth0 type veth peer name resC-rout1
+ip link add rout1-eth1 type veth peer name resD-rout1
+
+ip link add routB-eth1 type veth peer name resB-routB
+ip link add routB-eth0 type veth peer name internet1-routB
+
+ip link add rout2-eth0 type veth peer name resB-rout2
+ip link add rout2-eth1 type veth peer name resE-rout2
+
+
+# accrocher les liens aux namespaces desréseaux 1 et 2
 ip link set poste3-eth0 netns poste3
 ip link set poste4-eth0 netns poste4
-
-# accrocher les liens aux namespaces du réseaux 2
-ip link set routB-eth0 netns routB
-ip link set routB-eth1 netns routB
-ip link set rout2-eth0 netns rout2
-ip link set rout2-eth1 netns rout2
 ip link set poste1-eth0 netns poste1
 ip link set poste2-eth0 netns poste2
 
+
+ip link set rout1-eth0 netns rout1
+ip link set rout1-eth1 netns rout1
+
+ip link set rout2-eth0 netns rout2
+ip link set rout2-eth1 netns rout2
+
+ip link set routA-eth0 netns routA
+ip link set routA-eth1 netns routA
+
+ip link set routB-eth0 netns routB
+ip link set routB-eth1 netns routB
+
+
 # connecter les liens au switch du réseaux 1 et 2
-ovs-vsctl add-port internet1 internet1-routB
-ovs-vsctl add-port internet1 internet1-routA
-
-ovs-vsctl add-port resC resC-routA
-ovs-vsctl add-port resC resC-rout1
-
-ovs-vsctl add-port resB resB-routB
-ovs-vsctl add-port resB resB-rout2
-
-ovs-vsctl add-port resD resD-rout1
 ovs-vsctl add-port resD resD-poste3
 ovs-vsctl add-port resD resD-poste4
+ovs-vsctl add-port resD resD-rout1
+ovs-vsctl add-port resC resC-rout1
 
 
-ovs-vsctl add-port resE resE-rout2
 ovs-vsctl add-port resE resE-poste1
 ovs-vsctl add-port resE resE-poste2
+ovs-vsctl add-port resE resE-rout2
+ovs-vsctl add-port resB resB-rout2
+
+ovs-vsctl add-port resC resC-routA
+ovs-vsctl add-port resB resB-routB
+
+ovs-vsctl add-port internet1 internet1-routB
+ovs-vsctl add-port internet1 internet1-routA
 
 
 # activer les interfaces des namespaces routA et rout1 du réseaux 1
@@ -147,31 +156,47 @@ ip netns exec rout2 ip a add dev rout2-eth1.200 192.168.200.253/24 brd 192.168.2
 
 ip netns exec poste1 ip link add link poste1-eth0 name poste1-eth0.100 type vlan id 100
 ip netns exec poste1 ip link set poste1-eth0.100 up
-#ip netns exec poste1 ip a add dev poste1-eth0.100 192.168.100.1/24 brd 192.168.100.255
+
 
 ip netns exec poste2 ip link add link poste2-eth0 name poste2-eth0.200 type vlan id 200
 ip netns exec poste2 ip link set poste2-eth0.200 up
-#ip netns exec poste2 ip a add dev poste2-eth0.200 192.168.200.1/24 brd 192.168.200.255
+
 
 ip netns exec poste3 ip link add link poste3-eth0 name poste3-eth0.100 type vlan id 100
 ip netns exec poste3 ip link set poste3-eth0.100 up
-#ip netns exec poste3 ip a add dev poste3-eth0.100 192.168.100.2/24 brd 192.168.100.255
+
 
 ip netns exec poste4 ip link add link poste4-eth0 name poste4-eth0.200 type vlan id 200
 ip netns exec poste4 ip link set poste4-eth0.200 up
-#ip netns exec poste4 ip a add dev poste4-eth0.200 192.168.200.2/24 brd 192.168.200.255
 
 
+#
 
-# configurer la route par default du  rout1 réseaux 1
-ip netns exec rout1 ip r add default via 172.16.1.253
-ip netns exec rout2 ip r add default via 172.16.2.253
+# configurer la route par default du  rout1 et 2
+ip netns exec rout1 ip r add default via 172.16.1.254
+ip netns exec rout2 ip r add default via 172.16.2.254
 # configurer la routes sur routA et B
-ip netns exec routA ip r add 192.168.100.0/24 via 172.16.1.254
-ip netns exec routB ip r add 192.168.100.0/24 via 172.16.2.254
+ip netns exec routA ip r add 192.168.100.0/24 via 172.16.1.253 dev routA-eth1
+ip netns exec routA ip r add 192.168.200.0/24 via 172.16.1.253 dev routA-eth1
+ip netns exec routA ip r add default via 10.87.0.2
+
+ip netns exec routB ip r add 192.168.100.0/24 via 172.16.2.253 dev routB-eth1
+ip netns exec routB ip r add 192.168.200.0/24 via 172.16.2.253 dev routB-eth1 
+ip netns exec routB ip r add default via 10.87.0.1
 
 # activer le routage sur les routeurs
 ip netns exec routA sudo sysctl net.ipv4.conf.all.forwarding=1
+# mkdir -p /tmp/quaggaA
+# ip netns exec routA bash -c "mount --bind /tmp/quaggaA /run/quagga; chown -R quagga:quagga /run/quagga;zebra -d;ripd -d"
+
 ip netns exec routB sudo sysctl net.ipv4.conf.all.forwarding=1
+# mkdir -p /tmp/quaggaB
+#ip netns exec routB bash -c "mount --bind /tmp/quaggaB /run/quagga; chown -R quagga:quagga /run/quagga;zebra -d;ripd -d"
+
 ip netns exec rout1 sudo sysctl net.ipv4.conf.all.forwarding=1
+# mkdir -p /tmp/quagga1
+# ip netns exec rout1 bash -c "mount --bind /tmp/quagga1 /run/quagga; chown -R quagga:quagga /run/quagga;zebra -d;ripd -d"
+
 ip netns exec rout2 sudo sysctl net.ipv4.conf.all.forwarding=1
+# mkdir -p /tmp/quagga2
+# ip netns exec rout2 bash -c "mount --bind /tmp/quagga2 /run/quagga; chown -R quagga:quagga /run/quagga;zebra -d;ripd -d"
