@@ -193,6 +193,8 @@ subgraph cluster_5 {
 
 
 "resC"->"rout1-eth0";
+"DHCP"->"rout1-eth1.100";
+"DHCP"->"rout1-eth1.200";
 "resC"->"routA-eth1";
 "resB"->"rout2-eth0";
 "resB"->"routB-eth1";
