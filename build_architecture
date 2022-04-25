@@ -1,7 +1,5 @@
 #!/bin/bash -x
 
-#export PATH=/usr/lib/quagga:$PATH
-
 # créer les namespaces
 ip netns add poste3
 ip netns add poste4
@@ -21,7 +19,6 @@ ovs-vsctl add-br resB
 ovs-vsctl add-br internet1
 
 # créer le répertoire de travail
-# mkdir -p /run/quagga
 
 # configuration des réseaux 1 et 2
 
@@ -181,22 +178,11 @@ ip netns exec routA ip r add 192.168.200.0/24 via 172.16.1.253 dev routA-eth1
 ip netns exec routA ip r add default via 10.87.0.2
 
 ip netns exec routB ip r add 192.168.100.0/24 via 172.16.2.253 dev routB-eth1
-ip netns exec routB ip r add 192.168.200.0/24 via 172.16.2.253 dev routB-eth1 
+ip netns exec routB ip r add 192.168.200.0/24 via 172.16.2.253 dev routB-eth1
 ip netns exec routB ip r add default via 10.87.0.1
 
 # activer le routage sur les routeurs
-ip netns exec routA sudo sysctl net.ipv4.conf.all.forwarding=1
-# mkdir -p /tmp/quaggaA
-# ip netns exec routA bash -c "mount --bind /tmp/quaggaA /run/quagga; chown -R quagga:quagga /run/quagga;zebra -d;ripd -d"
-
+ip netns exec routA sudo sysctl  net.ipv4.conf.all.forwarding=1
 ip netns exec routB sudo sysctl net.ipv4.conf.all.forwarding=1
-# mkdir -p /tmp/quaggaB
-#ip netns exec routB bash -c "mount --bind /tmp/quaggaB /run/quagga; chown -R quagga:quagga /run/quagga;zebra -d;ripd -d"
-
 ip netns exec rout1 sudo sysctl net.ipv4.conf.all.forwarding=1
-# mkdir -p /tmp/quagga1
-# ip netns exec rout1 bash -c "mount --bind /tmp/quagga1 /run/quagga; chown -R quagga:quagga /run/quagga;zebra -d;ripd -d"
-
 ip netns exec rout2 sudo sysctl net.ipv4.conf.all.forwarding=1
-# mkdir -p /tmp/quagga2
-# ip netns exec rout2 bash -c "mount --bind /tmp/quagga2 /run/quagga; chown -R quagga:quagga /run/quagga;zebra -d;ripd -d"

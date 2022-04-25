@@ -3,6 +3,13 @@
 # installer sudo apt-get install bridge-utils
 # rout1 ===
 
+# eefacer les anciennes interfaces
+ip netns exec rout1 ip l del rout1-eth1.100
+ip netns exec rout1 ip l del rout1-eth1.200
+
+ip netns exec rout2 ip l del rout2-eth1.100
+ip netns exec rout2 ip l del rout2-eth1.200
+
 # Création du tunnel: l'interface IF2 ici l2tpeth0 de 172.16.1.253 -> 172.16.2.253
 
 ip netns exec rout1 ip l2tp add tunnel remote 172.16.2.253 local 172.16.1.253 encap ip tunnel_id 3000 peer_tunnel_id 4000
