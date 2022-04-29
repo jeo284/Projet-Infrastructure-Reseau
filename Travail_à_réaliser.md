@@ -52,6 +52,37 @@ sudo tcpdump -nvveX -i rout1-eth1.100
 
 ```
 
+ou sur rout1
+* ping -c 1 -I rout1-eth1.100 172.16.1.253
+* sudo tcpdump -lnvv -i rout1-eth1.100
+
+```
+tcpdump: listening on rout1-eth1.100, link-type EN10MB (Ethernet), capture size 262144 bytes
+20:11:39.325540 ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 172.16.1.253 tell 192.168.100.254, length 28
+20:11:40.344461 ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 172.16.1.253 tell 192.168.100.254, length 28
+20:11:41.368459 ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 172.16.1.253 tell 192.168.100.254, length 28
+
+```
+* sudo tcpdump -nvveX -i rout1-eth1 not tcp
+
+```
+tcpdump: listening on rout1-eth1, link-type EN10MB (Ethernet), capture size 262144 bytes
+^C20:11:39.325549 a2:a5:05:e6:db:6f > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 46: vlan 100, p 0, ethertype ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 172.16.1.253 tell 192.168.100.254, length 28
+	0x0000:  0001 0800 0604 0001 a2a5 05e6 db6f c0a8  .............o..
+	0x0010:  64fe 0000 0000 0000 ac10 01fd            d...........
+20:11:40.344476 a2:a5:05:e6:db:6f > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 46: vlan 100, p 0, ethertype ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 172.16.1.253 tell 192.168.100.254, length 28
+	0x0000:  0001 0800 0604 0001 a2a5 05e6 db6f c0a8  .............o..
+	0x0010:  64fe 0000 0000 0000 ac10 01fd            d...........
+20:11:41.368478 a2:a5:05:e6:db:6f > ff:ff:ff:ff:ff:ff, ethertype 802.1Q (0x8100), length 46: vlan 100, p 0, ethertype ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 172.16.1.253 tell 192.168.100.254, length 28
+	0x0000:  0001 0800 0604 0001 a2a5 05e6 db6f c0a8  .............o..
+	0x0010:  64fe 0000 0000 0000 ac10 01fd            d...........
+
+3 packets captured
+3 packets received by filter
+0 packets dropped by kernel
+
+```
+
 ## 2 - Vous rédigerez une description/présentation rapide du protocole L2TPv3 et de la technologie des VXLANs, « Virtual eXtensible Local Area Network », RFC 7348.
 Vous compléterez cette présentation :
 a. en comparant les deux solutions ;

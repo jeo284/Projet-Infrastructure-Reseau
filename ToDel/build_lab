@@ -13,10 +13,10 @@ sudo mkdir -p /etc/netns/routB/quagga
 # créer les daemons
 
 
-sudo cp /home/mona-quimbamba/Documents/M1/S2/Infra/TP/1/daemons /etc/netns/rout1/quagga/
-sudo cp /home/mona-quimbamba/Documents/M1/S2/Infra/TP/1/daemons /etc/netns/rout2/quagga/
-sudo cp /home/mona-quimbamba/Documents/M1/S2/Infra/TP/1/daemons /etc/netns/routA/quagga/
-sudo cp /home/mona-quimbamba/Documents/M1/S2/Infra/TP/1/daemons /etc/netns/routB/quagga/
+sudo cp /home/quimbamba/Documents/Infra/TP/1/daemons /etc/netns/rout1/quagga/
+sudo cp /home/quimbamba/Documents/Infra/TP/1/daemons /etc/netns/rout2/quagga/
+sudo cp /home/quimbamba/Documents/Infra/TP/1/daemons /etc/netns/routA/quagga/
+sudo cp /home/quimbamba/Documents/Infra/TP/1/daemons /etc/netns/routB/quagga/
 # le fichier « zebra.conf
 
 sudo cp /usr/share/doc/quagga-core/examples/zebra.conf.sample  /etc/netns/rout1/quagga/zebra.conf

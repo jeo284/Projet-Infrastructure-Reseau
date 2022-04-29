@@ -3,12 +3,14 @@
 # installer sudo apt-get install bridge-utils
 # rout1 ===
 
-# eefacer les anciennes interfaces
+# efacer les anciennes interfaces
 ip netns exec rout1 ip l del rout1-eth1.100
 ip netns exec rout1 ip l del rout1-eth1.200
 
 ip netns exec rout2 ip l del rout2-eth1.100
 ip netns exec rout2 ip l del rout2-eth1.200
+
+
 
 # Création du tunnel: l'interface IF2 ici l2tpeth0 de 172.16.1.253 -> 172.16.2.253
 
@@ -19,15 +21,16 @@ ip netns exec rout1 ip l2tp add session tunnel_id 3000 session_id 1000 peer_sess
 
 ip netns exec rout1 ip link set l2tpeth0 up
 
+
 # ajout du bridge "tunnel"
 
 ip netns exec rout1 brctl addbr tunnel
 
-# ajout dans de l'interface du tunnel (l2tpeth0) le bridge sans configuration
+# ajout dans de l'interface l2tpeth0 au bridge
 
 ip netns exec rout1 brctl addif tunnel l2tpeth0
 
-# ajout dans de l'interface connecté au réseau (rout1-eth1) le bridge sans configuration
+# ajout dans de l'interface connecté au réseau (rout1-eth1) au bridge
 ip netns exec rout1 brctl addif tunnel rout1-eth1
 
 # activation de l'interface correspondant au bridge
@@ -54,7 +57,7 @@ ip netns exec rout1 ip addr add 192.168.200.254/24 dev tunnel.200
 
 # Création du tunnel: l'interface IF2 ici l2tpeth0 de 172.16.2.253 -> 172.16.1.253
 
-ip netns exec rout2 ip l2tp add tunnel local 172.16.2.253 remote 172.16.1.253 encap ip tunnel_id 3000 peer_tunnel_id 4000
+ip netns exec rout2 ip l2tp add tunnel remote 172.16.1.253 local 172.16.2.253  encap ip tunnel_id 3000 peer_tunnel_id 4000
 ip netns exec rout2 ip l2tp add session tunnel_id 3000 session_id 1000 peer_session_id 2000
 
 # activation de l'interface l2tpeth0
@@ -63,10 +66,10 @@ ip netns exec rout2 ip link set l2tpeth0 up
 # ajout du bridge "tunnel"
 ip netns exec rout2 brctl addbr tunnel
 
-# ajout dans de l'interface du tunnel (l2tpeth0) le bridge sans configuration
+# ajout dans de l'interface l2tpeth0 au bridge
 ip netns exec rout2 brctl addif tunnel l2tpeth0
 
-# ajout dans de l'interface connecté au réseau (rout2-eth1) le bridge sans configuration
+# ajout dans de l'interface connecté au réseau (rout2-eth1) au bridge
 ip netns exec rout2 brctl addif tunnel rout2-eth1
 
 # activation de l'interface correspondant au bridge
