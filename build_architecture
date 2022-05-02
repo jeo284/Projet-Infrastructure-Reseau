@@ -174,16 +174,12 @@ ip netns exec poste4 ip link set poste4-eth0.200 up
 
 #
 
-# configurer la route par default du  rout1 et 2
+# configurer la routage
 ip netns exec rout1 ip r add default via 172.16.1.254
 ip netns exec rout2 ip r add default via 172.16.2.254
-# configurer la routes sur routA et B TODELETE
-#ip netns exec routA ip r add 192.168.100.0/24 via 172.16.1.253 dev routA-eth1
-#ip netns exec routA ip r add 192.168.200.0/24 via 172.16.1.253 dev routA-eth1
-#ip netns exec routB ip r add 192.168.100.0/24 via 172.16.2.253 dev routB-eth1
-#ip netns exec routB ip r add 192.168.200.0/24 via 172.16.2.253 dev routB-eth1
 ip netns exec routA ip r add default via 10.87.0.2
 ip netns exec routB ip r add default via 10.87.0.1
+
 
 # activer le routage sur les routeurs
 ip netns exec routA sudo sysctl net.ipv4.conf.all.forwarding=1

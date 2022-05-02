@@ -14,7 +14,7 @@ ip netns exec rout2 ip l del rout2-eth1.200
 
 # Création du tunnel: l'interface IF2 ici l2tpeth0 de 172.16.1.253 -> 172.16.2.253
 
-ip netns exec rout1 ip l2tp add tunnel remote 172.16.2.253 local 172.16.1.253 encap ip tunnel_id 3000 peer_tunnel_id 4000
+ip netns exec rout1 ip l2tp add tunnel remote 172.16.2.253 local 172.16.1.253 encap ip tunnel_id 3000 peer_tunnel_id 4000 udp_sport 9090
 ip netns exec rout1 ip l2tp add session tunnel_id 3000 session_id 1000 peer_session_id 2000
 
 # Activation de l'interface l2tpeth0
@@ -57,7 +57,7 @@ ip netns exec rout1 ip addr add 192.168.200.254/24 dev rout1-eth1.200
 
 # Création du tunnel: l'interface IF2 ici l2tpeth0 de 172.16.2.253 -> 172.16.1.253
 
-ip netns exec rout2 ip l2tp add tunnel remote 172.16.1.253 local 172.16.2.253  encap ip tunnel_id 4000 peer_tunnel_id 3000
+ip netns exec rout2 ip l2tp add tunnel remote 172.16.1.253 local 172.16.2.253  encap ip tunnel_id 4000 peer_tunnel_id 3000 udp_sport 9090
 ip netns exec rout2 ip l2tp add session tunnel_id 4000 session_id 2000 peer_session_id 1000
 
 # activation de l'interface l2tpeth0

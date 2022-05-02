@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+# à l’aide de règles « iptables »
+ip netns exec rout1  iptables -A FORWARD --in-interface rout1-eth1.100 --out-interface rout1-eth1.200 -j DROP
+ip netns exec rout1  iptables -A FORWARD --in-interface rout1-eth1.200 --out-interface rout1-eth1.100 -J DROP
+
+ip netns exec rout2  iptables -A FORWARD --in-interface rout2-eth1.100 --out-interface rout2-eth1.200 -j DROP
+ip netns exec rout2  iptables -A FORWARD --in-interface rout2-eth1.200 --out-interface rout2-eth1.100 -J DROP
+
+# à l’aide de la « Policy Routing ».
+ip netns exec rout1 ip rule add from 192.168.100.0/24 to 192.168.200.0/24 blackhole
+ip netns exec rout1 ip rule add from 192.168.200.0/24 to 192.168.100.0/24 blackhole
+
+ip netns exec rout2 ip rule add from 192.168.100.0/24 to 192.168.200.0/24 blackhole
+ip netns exec rout2 ip rule add from 192.168.200.0/24 to 192.168.100.0/24 blackhole
