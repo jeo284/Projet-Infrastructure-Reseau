@@ -1,4 +1,4 @@
 
-iperf -c @ip # client
+iperf -c  @ip # client
 
-iperf -s -i 1 -e  # serveur
+iperf  -s -i 1 -e  # serveur

@@ -2,15 +2,45 @@
 # efacer les anciennes interfaces
 ip netns exec rout1 ip l del rout1-eth1.100
 ip netns exec rout1 ip l del rout1-eth1.200
-
 ip netns exec rout2 ip l del rout2-eth1.100
 ip netns exec rout2 ip l del rout2-eth1.200
-
+#######################################################################################################################
+# rout1
 ip netns exec rout1  ip link add mon_tunnel type gretap remote 172.16.2.253 local 172.16.1.253 nopmtudisc
-ip netns exec rout1  ip addr add  192.168.100.254/24 dev mon_tunnel
 ip netns exec rout1  ip link set mon_tunnel up
 
+#
+ip netns exec rout1 brctl addbr tunnel_gre
+ip netns exec rout1 brctl addif tunnel_gre mon_tunnel
+ip netns exec rout1 brctl addif tunnel_gre rout1-eth1
 
+ip netns exec rout1 ip link set tunnel_gre up
+
+ip netns exec rout1 ip link add link tunnel_gre name rout1-eth1.100 type vlan id 100
+ip netns exec rout1 ip link set rout1-eth1.100 up
+ip netns exec rout1 ip link add link tunnel_gre name rout1-eth1.200 type vlan id 200
+ip netns exec rout1 ip link set rout1-eth1.200 up
+
+ip netns exec rout1  ip addr add  192.168.100.254/24 dev rout1-eth1.100
+ip netns exec rout1  ip addr add  192.168.200.254/24 dev rout1-eth1.200
+#######################################################################################################################
+# rout2
 ip netns exec rout2  ip link add mon_tunnel type gretap remote 172.16.1.253 local 172.16.2.253 nopmtudisc
-ip netns exec rout2  ip addr add  192.168.100.253/24 dev mon_tunnel
 ip netns exec rout2  ip link set mon_tunnel up
+
+#
+ip netns exec rout2 brctl addbr tunnel_gre
+ip netns exec rout2 brctl addif tunnel_gre mon_tunnel
+ip netns exec rout2 brctl addif tunnel_gre rout2-eth1
+
+ip netns exec rout2 ip link set tunnel_gre up
+
+ip netns exec rout2 ip link add link tunnel_gre name rout2-eth1.100 type vlan id 100
+ip netns exec rout2 ip link set rout2-eth1.100 up
+ip netns exec rout2 ip link add link tunnel_gre name rout2-eth1.200 type vlan id 200
+ip netns exec rout2 ip link set rout2-eth1.200 up
+#
+ip netns exec rout2  ip addr add  192.168.100.253/24 dev rout2-eth1.100
+ip netns exec rout2  ip addr add  192.168.200.253/24 dev rout2-eth1.200
+
+##############################################################################
