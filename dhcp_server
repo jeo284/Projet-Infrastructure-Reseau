@@ -9,4 +9,5 @@ then
 else
   echo " Usage <100> pour la vlan id 100 ou <200>  pour la vlan id 200"
 fi
-#dhcp-option=3,1.2.3.4
+# acces internet inteligent
+##dnsmasq -d -z -i rout1 - eth1 .100 -F 19 2.16 8.1 00. 1 , 192 .168 .10 0.1 50 , 255 .25 5.25 5.0 -O option : router , 1 9 2 . 1 6 8 . 1 0 0 . 2 5 

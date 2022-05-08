@@ -2,15 +2,22 @@
 
 
 # à l’aide de règles « iptables »
-ip netns exec rout1  iptables -A FORWARD --in-interface rout1-eth1.100 --out-interface rout1-eth1.200 -j DROP
-ip netns exec rout1  iptables -A FORWARD --in-interface rout1-eth1.200 --out-interface rout1-eth1.100 -J DROP
+ip netns exec rout1  iptables -A FORWARD --in-interface rout1-eth1.100 --out-interface rout1-eth1.200 -j REJECT
+ip netns exec rout1  iptables -A FORWARD --in-interface rout1-eth1.200 --out-interface rout1-eth1.100 -j REJECT
 
-ip netns exec rout2  iptables -A FORWARD --in-interface rout2-eth1.100 --out-interface rout2-eth1.200 -j DROP
-ip netns exec rout2  iptables -A FORWARD --in-interface rout2-eth1.200 --out-interface rout2-eth1.100 -J DROP
+ip netns exec rout2  iptables -A FORWARD --in-interface rout2-eth1.100 --out-interface rout2-eth1.200 -j REJECT
+ip netns exec rout2  iptables -A FORWARD --in-interface rout2-eth1.200 --out-interface rout2-eth1.100 -j REJECT
 
 # à l’aide de la « Policy Routing ».
-ip netns exec rout1 ip rule add from 192.168.100.0/24 to 192.168.200.0/24 blackhole
-ip netns exec rout1 ip rule add from 192.168.200.0/24 to 192.168.100.0/24 blackhole
+ip netns exec rout1 ip rule add from 192.168.100.0/24 to 192.168.200.0/24 prohibit
+ip netns exec rout1 ip rule add from 192.168.200.0/24 to 192.168.100.0/24 prohibit
 
-ip netns exec rout2 ip rule add from 192.168.100.0/24 to 192.168.200.0/24 blackhole
-ip netns exec rout2 ip rule add from 192.168.200.0/24 to 192.168.100.0/24 blackhole
+ip netns exec rout2 ip rule add from 192.168.100.0/24 to 192.168.200.0/24 prohibit
+ip netns exec rout2 ip rule add from 192.168.200.0/24 to 192.168.100.0/24 prohibit
+
+
+# multiples tables pour interdire le traffic
+# ajouter une table pour router le traffic vers un Vlan
+#ip rule add from 192.168.100.0/24 to 192.168.200.0/24 prio 16000 table Matable
+# interdire le traffic dans cette table
+#ip rule add prohibit 192.168.200.0/24 from 192.168.100.0/24 table Matable
