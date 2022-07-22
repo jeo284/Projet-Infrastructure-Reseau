@@ -1,0 +1,33 @@
+#!/bin/bash
+
+ip link set internet1 up
+ip address add 10.87.0.3/24 dev internet1
+
+sudo ip r add 172.16.2.0/24 via 10.87.0.3
+sudo ip r add 172.16.1.0/24 via 10.87.0.3
+
+ip netns exec routA ip r del default via 10.87.0.2 dev routA-eth0
+ip netns exec routA ip r add default via 10.87.0.3 # route par default vers le net
+ip netns exec routA ip r add 172.16.2.0/24 via 10.87.0.2 # route vers l'autre côte du réseau
+
+
+sysctl net.ipv4.conf.all.forwarding=1
+
+iptables -t nat -A POSTROUTING -s 10.87.0.0/24 -j MASQUERADE
+iptables -t nat -A POSTROUTING -s 172.16.1.0/24 -j MASQUERADE
+iptables -t nat -A POSTROUTING -s 172.16.2.0/24 -j MASQUERADE
+
+## réglé firewall pour les sous_réseaux 172.16.1.0/24 et 172.16.2.0/24
+ip netns exec routA  iptables -t nat -A POSTROUTING -s 172.16.1.0/24 -j MASQUERADE
+ip netns exec routA  iptables -t nat -A POSTROUTING -s 172.16.2.0/24 -j MASQUERADE
+
+ip netns exec routB  iptables -t nat -A POSTROUTING -s 172.16.1.0/24 -j MASQUERADE
+ip netns exec routB  iptables -t nat -A POSTROUTING -s 172.16.2.0/24 -j MASQUERADE
+
+## vous ajouterez l’accès à Internet sur Routeur1 pour les postes des deux VLANs,
+ip netns exec rout1 iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -j MASQUERADE
+ip netns exec rout1 iptables -t nat -A POSTROUTING -s 192.168.200.0/24 -j MASQUERADE
+
+
+ip netns exec rout2 iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -j MASQUERADE
+ip netns exec rout2 iptables -t nat -A POSTROUTING -s 192.168.200.0/24 -j MASQUERADE

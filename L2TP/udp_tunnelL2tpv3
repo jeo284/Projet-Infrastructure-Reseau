@@ -1,0 +1,92 @@
+#!/bin/bash
+
+# installer sudo apt-get install bridge-utils
+# rout1 ===
+
+# efacer les anciennes interfaces
+ip netns exec rout1 ip l del rout1-eth1.100
+ip netns exec rout1 ip l del rout1-eth1.200
+
+ip netns exec rout2 ip l del rout2-eth1.100
+ip netns exec rout2 ip l del rout2-eth1.200
+
+
+
+# Création du tunnel: l'interface IF2 ici l2tpeth0 de 172.16.1.253 -> 172.16.2.253
+
+ip netns exec rout1 ip l2tp add tunnel remote 172.16.2.253 local 172.16.1.253 encap udp tunnel_id 3000 peer_tunnel_id 4000 udp_sport 5050 udp_dport 9090
+ip netns exec rout1 ip l2tp add session tunnel_id 3000 session_id 1000 peer_session_id 2000
+
+# Activation de l'interface l2tpeth0
+
+ip netns exec rout1 ip link set l2tpeth0 up
+
+
+# ajout du bridge "tunnel"
+
+ip netns exec rout1 brctl addbr tunnel
+
+# ajout dans de l'interface l2tpeth0 au bridge
+
+ip netns exec rout1 brctl addif tunnel l2tpeth0
+
+# ajout dans de l'interface connecté au réseau (rout1-eth1) au bridge
+ip netns exec rout1 brctl addif tunnel rout1-eth1
+
+# activation de l'interface correspondant au bridge
+ip netns exec rout1 ip link set tunnel up
+
+# configuration de l’étiquettage VLAN pour le VLAN 100
+ip netns exec rout1 ip netns exec rout1 ip link add link tunnel name rout1-eth1.100 type vlan id 100
+
+# activation de l'interface tunnel.100
+ip netns exec rout1 ip link set rout1-eth1.100 up
+
+# configuration de l’étiquettage VLAN pour le VLAN 200
+ip netns exec rout1 ip netns exec rout1 ip link add link tunnel name rout1-eth1.200 type vlan id 200
+
+# activation de l'interface tunnel.200
+ip netns exec rout1 ip link set rout1-eth1.200 up
+
+# configuration IP de l’interface
+ip netns exec rout1 ip addr add 192.168.100.254/24 dev rout1-eth1.100
+ip netns exec rout1 ip addr add 192.168.200.254/24 dev rout1-eth1.200
+
+
+# rout2 ===
+
+# Création du tunnel: l'interface IF2 ici l2tpeth0 de 172.16.2.253 -> 172.16.1.253
+
+ip netns exec rout2 ip l2tp add tunnel remote 172.16.1.253 local 172.16.2.253  encap udp tunnel_id 4000 peer_tunnel_id 3000 udp_sport 9090 udp_dport 5050
+ip netns exec rout2 ip l2tp add session tunnel_id 4000 session_id 2000 peer_session_id 1000
+
+# activation de l'interface l2tpeth0
+ip netns exec rout2 ip link set l2tpeth0 up
+
+# ajout du bridge "tunnel"
+ip netns exec rout2 brctl addbr tunnel
+
+# ajout dans de l'interface l2tpeth0 au bridge
+ip netns exec rout2 brctl addif tunnel l2tpeth0
+
+# ajout dans de l'interface connecté au réseau (rout2-eth1) au bridge
+ip netns exec rout2 brctl addif tunnel rout2-eth1
+
+# activation de l'interface correspondant au bridge
+ip netns exec rout2 ip link set tunnel up
+
+# configuration de l’étiquettage VLAN pour le VLAN 100
+ip netns exec rout2 ip netns exec rout2 ip link add link tunnel name rout2-eth1.100 type vlan id 100
+
+# activation de l'interface tunnel.100
+ip netns exec rout2 ip link set rout2-eth1.100 up
+
+# configuration de l’étiquettage VLAN pour le VLAN 200
+ip netns exec rout2 ip netns exec rout2 ip link add link tunnel name rout2-eth1.200 type vlan id 200
+
+# activation de l'interface tunnel.200
+ip netns exec rout2 ip link set rout2-eth1.200 up
+
+# configuration IP de l’interface
+ip netns exec rout2 ip addr add 192.168.100.253/24 dev rout2-eth1.100
+ip netns exec rout2 ip addr add 192.168.200.253/24 dev rout2-eth1.200

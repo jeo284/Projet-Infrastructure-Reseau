@@ -1,0 +1,209 @@
+digraph G
+{
+    label = "Projet Infra";
+    labelloc = top;
+    node [shape=record];
+    edge [dir=both];
+
+
+subgraph cluster_0 {
+                node [shape=none];
+                style=filled;
+                color=lightgrey;
+		label = < <FONT POINT-SIZE="14"> <B> routA </B> </FONT> >;
+
+        "routA-eth0" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue"><b>routA-eth0</b></td></tr>
+                <tr><td bgcolor="white" align="left">IP: 10.87.0.1/24</td></tr>
+            </table>
+        >];
+        "routA-eth1" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue"><b>routA-eth1</b></td></tr>
+                <tr><td bgcolor="white" align="left">IP: 172.16.1.254/24</td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_1 {
+                node [shape=none];
+                style=filled;
+                color=lightgrey;
+		label = < <FONT POINT-SIZE="14"> <B> routB </B> </FONT> >;
+
+        "routB-eth0" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue"><b>routB-eth0</b></td></tr>
+                <tr><td bgcolor="white" align="left">IP: 10.87.0.2/24</td></tr>
+            </table>
+        >];
+        "routB-eth1" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue"><b>routB-eth1</b></td></tr>
+                <tr><td bgcolor="white" align="left">IP: 172.16.2.254/24</td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_2 {
+        node [shape=none];
+        color = none;
+        label="" ;
+
+        "resC" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td width="200px" bgcolor="orange"><b>resC</b></td></tr>
+            </table>
+        >];
+	}
+
+  subgraph cluster_3 {
+          node [shape=none];
+          color = none;
+          label="" ;
+
+          "resD" [label=<
+              <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                  <tr><td width="200px" bgcolor="orange"><b>resD</b></td></tr>
+              </table>
+          >];
+    }
+
+
+subgraph cluster_4 {
+        node [shape=none];
+        color = none;
+        label="" ;
+
+        "resB" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td width="200px" bgcolor="orange"><b>resB</b></td></tr>
+            </table>
+        >];
+	}
+subgraph cluster_5 {
+        node [shape=none];
+        color = none;
+        label="" ;
+
+        "internet1" [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td width="200px" bgcolor="orange"><b>internet1</b></td></tr>
+            </table>
+        >];
+	}
+
+  subgraph cluster_6 {
+                  node [shape=none];
+                  style=filled;
+                  color=lightgrey;
+  		label = < <FONT POINT-SIZE="14"> <B> rout1 </B> </FONT> >;
+
+      "rout1-eth0" [label=<
+          <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+              <tr><td bgcolor="lightblue"><b>rout1-eth0</b></td></tr>
+              <tr><td bgcolor="white" align="left">IP: 172.16.1.253/24</td></tr>
+          </table>
+      >];
+      "rout1-eth1.100" [label=<
+          <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+              <tr><td bgcolor="lightblue"><b>rout1-eth1.100</b></td></tr>
+              <tr><td bgcolor="white" align="left">IP: 192.168.100.254/24</td></tr>
+          </table>
+      >];
+      "rout1-eth1.200" [label=<
+          <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+              <tr><td bgcolor="lightblue"><b>rout1-eth1.200</b></td></tr>
+              <tr><td bgcolor="white" align="left">IP: 192.168.200.254/24</td></tr>
+          </table>
+      >];
+  	}
+
+
+    subgraph cluster_7
+    {
+                    node [shape=none];
+                    style=filled;
+                    color=lightgrey;
+    		label = < <FONT POINT-SIZE="14"> <B> rout2 </B> </FONT> >;
+
+
+            "rout2-eth1.100" [label=<
+                <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                    <tr><td bgcolor="lightblue"><b>rout2-eth1.100</b></td></tr>
+                    <tr><td bgcolor="white" align="left">IP: 192.168.100.253/24</td></tr>
+                </table>
+            >];
+            "rout2-eth1.200" [label=<
+                <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                    <tr><td bgcolor="lightblue"><b>rout2-eth1.200</b></td></tr>
+                    <tr><td bgcolor="white" align="left">IP: 192.168.200.253/24</td></tr>
+                </table>
+            >];
+            "rout2-eth0" [label=<
+                <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                    <tr><td bgcolor="lightblue"><b>rout2-eth0</b></td></tr>
+                    <tr><td bgcolor="white" align="left">IP: 172.16.2.253/24</td></tr>
+                </table>
+            >];
+    	}
+
+      subgraph cluster_8 {
+              node [shape=none];
+              color = none;
+              label="" ;
+
+              "resE" [label=<
+                  <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                      <tr><td width="200px" bgcolor="orange"><b>resE</b></td></tr>
+                  </table>
+              >];
+      	}
+
+
+        subgraph cluster_9 {
+                        node [shape=none];
+                        style=filled;
+                        color=lightgrey;
+        		label = < <FONT POINT-SIZE="14"> <B> poste4 </B> </FONT> >;
+
+        	}
+        subgraph cluster_10 {
+                        node [shape=none];
+                        style=filled;
+                        color=lightgrey;
+        		label = < <FONT POINT-SIZE="14"> <B> poste1 </B> </FONT> >;
+
+        	}
+        subgraph cluster_11 {
+                        node [shape=none];
+                        style=filled;
+                        color=lightgrey;
+        		label = < <FONT POINT-SIZE="14"> <B> poste2 </B> </FONT> >;
+
+        	}
+          subgraph cluster_12 {
+                          node [shape=none];
+                          style=filled;
+                          color=lightgrey;
+              label = < <FONT POINT-SIZE="14"> <B> poste3 </B> </FONT> >;
+
+            }
+
+
+
+
+"resC"->"rout1-eth0";
+"DHCP"->"rout1-eth1.100";
+"DHCP"->"rout1-eth1.200";
+"resC"->"routA-eth1";
+"resB"->"rout2-eth0";
+"resB"->"routB-eth1";
+"resD"->"poste3-eth0";
+"resD"->"poste4-eth0";
+"resD"->"rout1-eth1";
+"resE"->"poste1-eth0";
+"resE"->"poste2-eth0";
+"resE"->"rout2-eth1";
+"internet1"->"routB-eth0";
+"internet1"->"routA-eth0";
+}

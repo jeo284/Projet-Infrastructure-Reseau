@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ $1 -eq 100 ]
+then
+  ip netns exec rout1 dnsmasq -d -z -i  rout1-eth1.100 -F 192.168.100.1,192.168.100.150,255.255.255.0
+elif [ $1 -eq 200 ]
+then
+  ip netns exec rout1 dnsmasq -d -z -i  rout1-eth1.200 -F 192.168.200.1,192.168.200.150,255.255.255.0
+else
+  echo " Usage <100> pour la vlan id 100 ou <200>  pour la vlan id 200"
+fi
+# acces internet inteligent
+##dnsmasq -d -z -i rout1 - eth1 .100 -F 19 2.16 8.1 00. 1 , 192 .168 .10 0.1 50 , 255 .25 5.25 5.0 -O option : router , 1 9 2 . 1 6 8 . 1 0 0 . 2 5 
